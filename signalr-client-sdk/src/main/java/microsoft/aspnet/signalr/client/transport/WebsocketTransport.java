@@ -6,11 +6,6 @@ See License.txt in the project root for license information.
 
 package microsoft.aspnet.signalr.client.transport;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-
 import com.google.gson.Gson;
 
 import org.java_websocket.client.WebSocketClient;
@@ -18,6 +13,14 @@ import org.java_websocket.exceptions.InvalidDataException;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
 import org.java_websocket.util.Charsetfunctions;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+
+import javax.net.ssl.SSLSocketFactory;
 
 import microsoft.aspnet.signalr.client.ConnectionBase;
 import microsoft.aspnet.signalr.client.LogLevel;
@@ -65,15 +68,29 @@ public class WebsocketTransport extends HttpClientTransport {
         final String groupsToken = connection.getGroupsToken() != null ? connection.getGroupsToken() : "";
         final String connectionData = connection.getConnectionData() != null ? connection.getConnectionData() : "";
 
-
+        boolean isSsl = false;
         String url = null;
         try {
-            url = connection.getUrl() + "signalr/" + connectionString + '?'
+            url = connection.getUrl() + connectionString + '?'
                     + "connectionData=" + URLEncoder.encode(URLEncoder.encode(connectionData, "UTF-8"), "UTF-8")
                     + "&connectionToken=" + URLEncoder.encode(URLEncoder.encode(connectionToken, "UTF-8"), "UTF-8")
                     + "&groupsToken=" + URLEncoder.encode(groupsToken, "UTF-8")
                     + "&messageId=" + URLEncoder.encode(messageId, "UTF-8")
                     + "&transport=" + URLEncoder.encode(transport, "UTF-8");
+
+            if (connection.getQueryString() != null) {
+                url += "&" + connection.getQueryString();
+            }
+
+            if (url.startsWith("https://")) {
+                isSsl = true;
+                url = url.replace("https://", "wss://");
+
+            } else if (url.startsWith("http://")) {
+                url = url.replace("http://", "ws://");
+
+            }
+
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -141,6 +158,18 @@ public class WebsocketTransport extends HttpClientTransport {
                 }
             }
         };
+
+        if (isSsl) {
+            SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+            try {
+                mWebSocketClient.setSocket(factory.createSocket());
+
+            } catch (IOException e1) {
+                e1.printStackTrace();
+
+            }
+        }
+
         mWebSocketClient.connect();
 
         connection.closed(new Runnable() {

@@ -31,12 +31,13 @@ import microsoft.aspnet.signalr.client.UpdateableCancellableFuture;
 import microsoft.aspnet.signalr.client.http.HttpConnection;
 
 /**
- * Implements the WebsocketTransport for the Java SignalR library
- * Created by stas on 07/07/14.
+ * Implements the WebsocketTransport for the Java SignalR library Created by stas on 07/07/14.
+ *
+ * Edited by Armin Noroozi on 20/07/2015.
  */
 public class WebsocketTransport extends HttpClientTransport {
 
-    private String mPrefix;
+    private String mMessage;
     private static final Gson gson = new Gson();
     WebSocketClient mWebSocketClient;
     private UpdateableCancellableFuture<Void> mConnectionFuture;
@@ -132,28 +133,23 @@ public class WebsocketTransport extends HttpClientTransport {
             public void onFragment(Framedata frame) {
                 try {
                     String decodedString = Charsetfunctions.stringUtf8(frame.getPayloadData());
-
-                    if(decodedString.equals("]}")){
+                    if (decodedString.endsWith(":[") || mMessage == null) {
+                        mMessage = decodedString;
                         return;
                     }
 
-                    if(decodedString.endsWith(":[") || null == mPrefix){
-                        mPrefix = decodedString;
-                        return;
+                    String finalMessage = null;
+                    mMessage += decodedString;
+                    if (isJSONValid(mMessage)) {
+                        finalMessage = mMessage;
                     }
 
-                    String simpleConcatenate = mPrefix + decodedString;
-
-                    if(isJSONValid(simpleConcatenate)){
-                        onMessage(simpleConcatenate);
-                    }else{
-                        String extendedConcatenate = simpleConcatenate + "]}";
-                        if (isJSONValid(extendedConcatenate)) {
-                            onMessage(extendedConcatenate);
-                        } else {
-                            log("invalid json received:" + decodedString, LogLevel.Critical);
-                        }
+                    if (finalMessage != null) {
+                        log("decoded message from frames: " + finalMessage, LogLevel.Verbose);
+                        onMessage(finalMessage);
+                        mMessage = null;
                     }
+
                 } catch (InvalidDataException e) {
                     e.printStackTrace();
                 }
@@ -189,11 +185,11 @@ public class WebsocketTransport extends HttpClientTransport {
         return new UpdateableCancellableFuture<Void>(null);
     }
 
-    private boolean isJSONValid(String test){
+    private boolean isJSONValid(String test) {
         try {
             gson.fromJson(test, Object.class);
             return true;
-        } catch(com.google.gson.JsonSyntaxException ex) {
+        } catch (com.google.gson.JsonSyntaxException ex) {
             return false;
         }
     }

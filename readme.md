@@ -1,26 +1,25 @@
-# ASP.NET SignalR for Java and Android
-ASP.NET SignalR is a new library for ASP.NET developers that makes it incredibly simple to add real-time web functionality to your applications. What is "real-time web" functionality? It's the ability to have your server-side code push content to the connected clients as it happens, in real-time.
+# ASP.NET SignalR library for Java and Android
+For more infomation on SignalR, please look at the official SignalR website (http://signalr.net/).
 
-## What can it be used for?
-Pushing data from the server to the client (not just browser clients) has always been a tough problem. SignalR makes 
-it dead easy and handles all the heavy lifting for you.
+This library can be used in both Java and Android applications.
 
-This library can be used from both regular Java or Android applications.
+## Is this the official SignalR library
+This repository was forked from the official [SignalR repository](https://github.com/SignalR/java-client) on June 2015. Since that date, changes have been made to the code to fix issues that existed on the official code. However, these changes have never been merged back to the official repository.
 
 ## Documentation
-See the [documentation](http://asp.net/signalr)
-	
+Official SignalR [documentation](http://asp.net/signalr)
+
 ## LICENSE
-[Apache 2.0 License](https://github.com/SignalR/SignalR/blob/master/LICENSE.md)
+The original [Apache 2.0 License](https://github.com/SignalR/SignalR/blob/master/LICENSE.md)
 
 ## Contributing
 
-See the [contribution  guidelines](https://github.com/SignalR/SignalR/blob/master/CONTRIBUTING.md)
+See the original [contribution  guidelines](https://github.com/SignalR/SignalR/blob/master/CONTRIBUTING.md)
 
 ## Building the source
 
 ```
-git clone git@github.com:SignalR/java-client.git (or https if you use https)
+git clone git@github.com:arminelec/signalr-java-client.git (or https if you use https)
 ```
 
 Open Android Studio, click "Import Non-Android Studio Project" and select the cloned directory 

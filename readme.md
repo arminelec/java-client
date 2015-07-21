@@ -3,7 +3,7 @@ For more infomation on SignalR, please look at the official SignalR website (htt
 
 This library can be used in both Java and Android applications.
 
-## Is this the official SignalR library
+## Is this the official SignalR library?
 This repository was forked from the official [SignalR repository](https://github.com/SignalR/java-client) on June 2015. Since that date, changes have been made to the code to fix issues that existed on the official code. However, these changes have never been merged back to the official repository.
 
 ## Documentation

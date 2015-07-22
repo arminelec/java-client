@@ -181,8 +181,17 @@ public class WebsocketTransport extends HttpClientTransport {
 
     @Override
     public SignalRFuture<Void> send(ConnectionBase connection, String data, DataResultCallback callback) {
-        mWebSocketClient.send(data);
-        return new UpdateableCancellableFuture<Void>(null);
+        try {
+            mWebSocketClient.send(data);
+            return new UpdateableCancellableFuture<>(null);
+        } catch (Throwable e) {
+            log(e);
+
+            SignalRFuture<Void> future = new SignalRFuture<>();
+            future.triggerError(e);
+
+            return future;
+        }
     }
 
     private boolean isJSONValid(String test) {
